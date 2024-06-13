@@ -70,19 +70,32 @@
     </header>
     <div class="main-content container">
         <h2>Weather Alerts</h2>
-        <div class="alert">
-            <p><strong>⚠️ Tornado Watch Issued!</strong></p>
-            <p><strong>Date:</strong> June 13th, 2024</p>
-            <p>A tornado watch has been issued for Ontario. Please take necessary precautions and stay updated with the latest weather information.</p>
-            <p><a href="https://instantweather.ca/2024/06/13/LYlEsV-tornado-watch-issued/" target="_blank">Read more</a></p>
-        </div>
-        <div class="alert">
-            <p><strong>⚠️ Severe Weather Alerts from Weather.gc.ca</strong></p>
-            <p><a href="https://www.weather.gc.ca/#alerttable" target="_blank">View current weather alerts</a></p>
-        </div>
+        <div id="alerts"></div>
     </div>
     <footer>
         <p>Powered by: PulseDynamics 'pDW' &copy; 2024</p>
     </footer>
+
+    <script>
+        async function fetchWeatherAlerts() {
+            try {
+                const response = await fetch('https://www.weather.gc.ca/warnings/index_e.html');
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                const alertTable = doc.querySelector('#alerttable');
+                if (alertTable) {
+                    document.getElementById('alerts').innerHTML = alertTable.outerHTML;
+                } else {
+                    document.getElementById('alerts').innerHTML = '<p>No weather alerts at this moment.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching weather alerts:', error);
+                document.getElementById('alerts').innerHTML = '<p>Failed to load weather alerts.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchWeatherAlerts);
+    </script>
 </body>
 </html>
