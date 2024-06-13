@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Weather - ONWeather Chaser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #0779e4 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header ul {
+            padding: 0;
+            list-style: none;
+        }
+        header li {
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        .main-content {
+            padding: 20px;
+            background: #fff;
+        }
+        .weather-form {
+            margin-bottom: 20px;
+        }
+        .weather-form input {
+            padding: 10px;
+            font-size: 16px;
+            width: calc(100% - 22px);
+            margin-bottom: 10px;
+        }
+        .weather-form button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #0779e4;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .weather-form button:hover {
+            background-color: #005bb5;
+        }
+        .weather-result {
+            background: #ff0000;
+            color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            color: #fff;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>ONWeather Chaser</h1>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="updates.html">Weather Updates</a></li>
+                <li><a href="alerts.html">Weather Alerts</a></li>
+                <li><a href="current_weather.html">Current Weather</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </header>
+    <div class="main-content container">
+        <h2>Current Weather</h2>
+        <div class="weather-form">
+            <input type="text" id="locationInput" placeholder="Enter your location">
+            <button onclick="fetchCurrentWeather()">Get Weather</button>
+        </div>
+        <div id="weatherResult" class="weather-result"></div>
+    </div>
+    <footer>
+        <p>Powered by: PulseDynamics 'pDW' &copy; 2024</p>
+    </footer>
+
+    <script>
+        async function fetchCurrentWeather() {
+            const location = document.getElementById('locationInput').value;
+            const apiKey = '0618ef12ee694265be4154023242305';
+            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const weatherResult = document.getElementById('weatherResult');
+
+                if (data.error) {
+                    weatherResult.innerHTML = `<p>Error: ${data.error.message}</p>`;
+                } else {
+                    const { location, current } = data;
+                    weatherResult.innerHTML = `
+                        <p><strong>Location:</strong> ${location.name}, ${location.region}, ${location.country}</p>
+                        <p><strong>Temperature:</strong> ${current.temp_c}°C (${current.temp_f}°F)</p>
+                        <p><strong>Condition:</strong> ${current.condition.text}</p>
+                        <p><strong>Humidity:</strong> ${current.humidity}%</p>
+                        <p><strong>Wind:</strong> ${current.wind_kph} kph (${current.wind_mph} mph)</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('weatherResult').innerHTML = '<p>Failed to load weather data.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
