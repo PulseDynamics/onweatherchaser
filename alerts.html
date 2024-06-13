@@ -79,10 +79,10 @@
     <script>
         async function fetchWeatherAlerts() {
             try {
-                const response = await fetch('http://localhost:3000/weather-alerts');
-                const text = await response.text();
+                const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.weather.gc.ca/warnings/index_e.html'));
+                const data = await response.json();
                 const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
+                const doc = parser.parseFromString(data.contents, 'text/html');
                 const alertTable = doc.querySelector('#alerttable');
                 if (alertTable) {
                     document.getElementById('alerts').innerHTML = alertTable.outerHTML;
