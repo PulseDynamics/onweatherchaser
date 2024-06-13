@@ -79,15 +79,26 @@
     <script>
         async function fetchWeatherAlerts() {
             try {
-                const response = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.weather.gc.ca/warnings/index_e.html'));
+                const response = await fetch('https://www.weather.gc.ca/data/dms/alert_geojson_v2/alerts.public.en.geojson');
                 const data = await response.json();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(data.contents, 'text/html');
-                const alertTable = doc.querySelector('#alerttable');
-                if (alertTable) {
-                    document.getElementById('alerts').innerHTML = alertTable.outerHTML;
+                const alertsContainer = document.getElementById('alerts');
+
+                if (data.features.length > 0) {
+                    data.features.forEach(feature => {
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert';
+                        alertDiv.innerHTML = `
+                            <p><strong>⚠️ ${feature.properties.event} ⚠️</strong></p>
+                            <p><strong>Area:</strong> ${feature.properties.area}</p>
+                            <p><strong>Severity:</strong> ${feature.properties.severity}</p>
+                            <p><strong>Description:</strong> ${feature.properties.description}</p>
+                            <p><strong>Effective:</strong> ${new Date(feature.properties.effective).toLocaleString()}</p>
+                            <p><strong>Expires:</strong> ${new Date(feature.properties.expires).toLocaleString()}</p>
+                        `;
+                        alertsContainer.appendChild(alertDiv);
+                    });
                 } else {
-                    document.getElementById('alerts').innerHTML = '<p>No weather alerts at this moment.</p>';
+                    alertsContainer.innerHTML = '<p>No weather alerts at this moment.</p>';
                 }
             } catch (error) {
                 console.error('Error fetching weather alerts:', error);
