@@ -79,24 +79,33 @@
     <script>
         async function fetchWeatherAlerts() {
             try {
-                const response = await fetch('https://www.weather.gc.ca/data/dms/alert_geojson_v2/alerts.public.en.geojson');
-                const data = await response.json();
+                const response = await fetch('https://dd.weather.gc.ca/alerts/cap/20240613/CWTO/13/T_WZCN80_C_CWTO_202406131339_2130034294.cap');
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+                
                 const alertsContainer = document.getElementById('alerts');
 
-                if (data.features.length > 0) {
-                    data.features.forEach(feature => {
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = 'alert';
-                        alertDiv.innerHTML = `
-                            <p><strong>⚠️ ${feature.properties.event} ⚠️</strong></p>
-                            <p><strong>Area:</strong> ${feature.properties.area}</p>
-                            <p><strong>Severity:</strong> ${feature.properties.severity}</p>
-                            <p><strong>Description:</strong> ${feature.properties.description}</p>
-                            <p><strong>Effective:</strong> ${new Date(feature.properties.effective).toLocaleString()}</p>
-                            <p><strong>Expires:</strong> ${new Date(feature.properties.expires).toLocaleString()}</p>
-                        `;
-                        alertsContainer.appendChild(alertDiv);
-                    });
+                const alert = xmlDoc.querySelector('alert');
+                if (alert) {
+                    const event = alert.querySelector('event').textContent;
+                    const areaDesc = alert.querySelector('areaDesc').textContent;
+                    const severity = alert.querySelector('severity').textContent;
+                    const description = alert.querySelector('description').textContent;
+                    const effective = alert.querySelector('effective').textContent;
+                    const expires = alert.querySelector('expires').textContent;
+
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert';
+                    alertDiv.innerHTML = `
+                        <p><strong>⚠️ ${event} ⚠️</strong></p>
+                        <p><strong>Area:</strong> ${areaDesc}</p>
+                        <p><strong>Severity:</strong> ${severity}</p>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <p><strong>Effective:</strong> ${new Date(effective).toLocaleString()}</p>
+                        <p><strong>Expires:</strong> ${new Date(expires).toLocaleString()}</p>
+                    `;
+                    alertsContainer.appendChild(alertDiv);
                 } else {
                     alertsContainer.innerHTML = '<p>No weather alerts at this moment.</p>';
                 }
