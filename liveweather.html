@@ -112,6 +112,9 @@
 
             try {
                 const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 const data = await response.json();
                 const weatherResult = document.getElementById('weatherResult');
 
@@ -134,7 +137,7 @@
                     `;
                 }
             } catch (error) {
-                document.getElementById('weatherResult').innerHTML = '<p>Failed to load weather data.</p>';
+                document.getElementById('weatherResult').innerHTML = `<p>Failed to load weather data: ${error.message}</p>`;
             }
         }
     </script>
