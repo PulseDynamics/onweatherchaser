@@ -105,7 +105,7 @@
         async function fetchCurrentWeather() {
             const location = document.getElementById('locationInput').value;
             const apiKey = '0618ef12ee694265be4154023242305';
-            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
+            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=0618ef12ee694265be4154023242305&q=${location}&aqi=no`;
 
             try {
                 const response = await fetch(apiUrl);
