@@ -79,7 +79,7 @@
     <script>
         async function fetchWeatherAlerts() {
             try {
-                const response = await fetch('https://www.weather.gc.ca/warnings/index_e.html');
+                const response = await fetch('http://localhost:3000/weather-alerts');
                 const text = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(text, 'text/html');
