@@ -108,40 +108,42 @@
 
     <script>
         async function fetchCurrentWeather() {
-            const location = document.getElementById('locationInput').value;
-            const apiKey = '0618ef12ee694265be4154023242305';
-            const apiUrl = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
+    const location = document.getElementById('locationInput').value;
+    const apiKey = '0618ef12ee694265be4154023242305';
+    const apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=no`;
 
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                const weatherResult = document.getElementById('weatherResult');
-
-                if (data.error) {
-                    weatherResult.innerHTML = `<p>Error: ${data.error.message}</p>`;
-                } else {
-                    const { location, current } = data;
-                    weatherResult.innerHTML = `
-                        <p><strong>Location:</strong> ${location.name}, ${location.region}, ${location.country}</p>
-                        <p><strong>Temperature:</strong> ${current.temp_c}°C (${current.temp_f}°F)</p>
-                        <p><strong>Condition:</strong> ${current.condition.text} <img src="${current.condition.icon}" alt="Weather icon"></p>
-                        <p><strong>Humidity:</strong> ${current.humidity}%</p>
-                        <p><strong>Wind:</strong> ${current.wind_kph} kph (${current.wind_mph} mph), ${current.wind_dir}</p>
-                        <p><strong>Pressure:</strong> ${current.pressure_mb} mb (${current.pressure_in} in)</p>
-                        <p><strong>Precipitation:</strong> ${current.precip_mm} mm (${current.precip_in} in)</p>
-                        <p><strong>Feels like:</strong> ${current.feelslike_c}°C (${current.feelslike_f}°F)</p>
-                        <p><strong>Visibility:</strong> ${current.vis_km} km (${current.vis_miles} miles)</p>
-                        <p><strong>UV Index:</strong> ${current.uv}</p>
-                        <p><strong>Gusts:</strong> ${current.gust_kph} kph (${current.gust_mph} mph)</p>
-                    `;
-                }
-            } catch (error) {
-                document.getElementById('weatherResult').innerHTML = `<p>Failed to load weather data: ${error.message}</p>`;
-            }
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        const data = await response.json();
+        const weatherResult = document.getElementById('weatherResult');
+
+        if (data.error) {
+            weatherResult.innerHTML = `<p>Error: ${data.error.message}</p>`;
+        } else {
+            const { location, current } = data;
+            weatherResult.innerHTML = `
+                <p><strong>Location:</strong> ${location.name}, ${location.region}, ${location.country}</p>
+                <p><strong>Temperature:</strong> ${current.temp_c}°C (${current.temp_f}°F)</p>
+                <p><strong>Condition:</strong> ${current.condition.text} <img src="${current.condition.icon}" alt="Weather icon"></p>
+                <p><strong>Humidity:</strong> ${current.humidity}%</p>
+                <p><strong>Wind:</strong> ${current.wind_kph} kph (${current.wind_mph} mph), ${current.wind_dir}</p>
+                <p><strong>Pressure:</strong> ${current.pressure_mb} mb (${current.pressure_in} in)</p>
+                <p><strong>Precipitation:</strong> ${current.precip_mm} mm (${current.precip_in} in)</p>
+                <p><strong>Feels like:</strong> ${current.feelslike_c}°C (${current.feelslike_f}°F)</p>
+                <p><strong>Visibility:</strong> ${current.vis_km} km (${current.vis_miles} miles)</p>
+                <p><strong>UV Index:</strong> ${current.uv}</p>
+                <p><strong>Gusts:</strong> ${current.gust_kph} kph (${current.gust_mph} mph)</p>
+            `;
+        }
+    } catch (error) {
+        console.error('Failed to load weather data:', error);
+        document.getElementById('weatherResult').innerHTML = `<p>Failed to load weather data: ${error.message}</p>`;
+    }
+}
+
     </script>
 </body>
 </html>
