@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Warnings</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Warnings for Ontario</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Warnings</th>
+            </tr>
+        </thead>
+        <tbody id="warnings-table">
+        </tbody>
+    </table>
+
+    <script>
+        async function fetchWeatherWarnings() {
+            try {
+                const response = await fetch('https://www.weather.gc.ca/?alertTableFilterProv=ON');
+                const text = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, 'text/html');
+                const rows = doc.querySelectorAll('.wb-tables table tbody tr');
+
+                const tableBody = document.getElementById('warnings-table');
+                tableBody.innerHTML = ''; // Clear existing content
+
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 2) {
+                        const region = cells[0].textContent.trim();
+                        const warnings = cells[1].textContent.trim();
+                        
+                        const tr = document.createElement('tr');
+                        const regionCell = document.createElement('td');
+                        regionCell.textContent = region;
+                        const warningsCell = document.createElement('td');
+                        warningsCell.textContent = warnings;
+                        tr.appendChild(regionCell);
+                        tr.appendChild(warningsCell);
+                        tableBody.appendChild(tr);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching weather warnings:', error);
+            }
+        }
+
+        fetchWeatherWarnings();
+        // Optionally, refresh the data every 30 minutes
+        setInterval(fetchWeatherWarnings, 1800000);
+    </script>
+</body>
+</html>
