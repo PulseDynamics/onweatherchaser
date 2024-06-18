@@ -35,7 +35,7 @@
                 const text = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(text, 'text/html');
-                const rows = doc.querySelectorAll('.wb-tables table tbody tr');
+                const rows = doc.querySelectorAll('#collapsible-alerts table tbody tr');
 
                 const tableBody = document.getElementById('warnings-table');
                 tableBody.innerHTML = ''; // Clear existing content
