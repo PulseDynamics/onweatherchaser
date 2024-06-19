@@ -31,31 +31,29 @@
     <script>
         async function fetchWeatherWarnings() {
             try {
-                const response = await fetch('https://www.weather.gc.ca/?alertTableFilterProv=ON');
+                const response = await fetch('https://dd.weather.gc.ca/alerts/cap/20240619/CWTO/17/T_WWCN12_C_CWTO_202406191714_2330244583.cap');
                 const text = await response.text();
                 const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
-                const rows = doc.querySelectorAll('#collapsible-alerts table tbody tr');
+                const xmlDoc = parser.parseFromString(text, 'application/xml');
 
+                const entries = xmlDoc.getElementsByTagName('entry');
                 const tableBody = document.getElementById('warnings-table');
                 tableBody.innerHTML = ''; // Clear existing content
 
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    if (cells.length >= 2) {
-                        const region = cells[0].textContent.trim();
-                        const warnings = cells[1].textContent.trim();
-                        
-                        const tr = document.createElement('tr');
-                        const regionCell = document.createElement('td');
-                        regionCell.textContent = region;
-                        const warningsCell = document.createElement('td');
-                        warningsCell.textContent = warnings;
-                        tr.appendChild(regionCell);
-                        tr.appendChild(warningsCell);
-                        tableBody.appendChild(tr);
-                    }
-                });
+                for (let i = 0; i < entries.length; i++) {
+                    const entry = entries[i];
+                    const region = entry.getElementsByTagName('cap:areaDesc')[0]?.textContent || 'Unknown';
+                    const warnings = entry.getElementsByTagName('cap:event')[0]?.textContent || 'No warnings';
+
+                    const tr = document.createElement('tr');
+                    const regionCell = document.createElement('td');
+                    regionCell.textContent = region;
+                    const warningsCell = document.createElement('td');
+                    warningsCell.textContent = warnings;
+                    tr.appendChild(regionCell);
+                    tr.appendChild(warningsCell);
+                    tableBody.appendChild(tr);
+                }
             } catch (error) {
                 console.error('Error fetching weather warnings:', error);
             }
