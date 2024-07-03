@@ -36,23 +36,26 @@
     <div id="metar-info"></div>
 
     <script>
-        function getMetar() {
-            const icao = document.getElementById('icao').value;
+        async function getMetar() {
+            const icao = document.getElementById('icao').value.trim().toUpperCase();
             const url = `https://metar.vatsim.net/${icao}`;
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    displayMetar(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching METAR data:', error);
-                    document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
-                });
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                displayMetar(data);
+            } catch (error) {
+                console.error('Error fetching METAR data:', error);
+                document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
+            }
         }
 
         function displayMetar(data) {
             const metarInfoDiv = document.getElementById('metar-info');
+
             metarInfoDiv.innerHTML = `
                 <h2>METAR Information for ${data.icao}</h2>
                 <p><strong>Temperature:</strong> ${data.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
