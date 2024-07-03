@@ -21,6 +21,7 @@
         }
         #metar-info {
             margin-top: 20px;
+            white-space: pre-wrap; /* Keeps the METAR data in one line */
         }
         .icon {
             width: 50px;
@@ -30,9 +31,9 @@
 </head>
 <body>
     <h1>Get METAR Information</h1>
-    <p>Enter ICAO code:</p>
-    <input type="text" id="icao" placeholder="e.g., CYOW">
-    <button onclick="getMetar()">Get METAR</button>
+    <p>Enter Airport ICAO code:</p>
+    <input type="text" id="icao" placeholder="e.g., CYYZ">
+    <button onclick="getMetar()">Fetch</button>
     <div id="metar-info"></div>
 
     <script>
@@ -59,38 +60,7 @@
 
         function displayMetar(data) {
             const metarInfoDiv = document.getElementById('metar-info');
-
-            const metarData = parseMetar(data);
-
-            if (!metarData) {
-                metarInfoDiv.innerHTML = 'Error parsing METAR data.';
-                return;
-            }
-
-            metarInfoDiv.innerHTML = `
-                <h2>METAR Information for ${metarData.station}</h2>
-                <p><strong>Temperature:</strong> ${metarData.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
-                <p><strong>Wind:</strong> ${metarData.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
-                <p><strong>Visibility:</strong> ${metarData.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
-                <p><strong>Weather:</strong> ${metarData.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
-                <p><strong>Remarks:</strong> ${metarData.remarks}</p>
-            `;
-        }
-
-        function parseMetar(data) {
-            // Example METAR: "CYOW 031400Z 25015G25KT 15SM FEW025 SCT040 BKN080 25/17 A3002 RMK AC3AC3 SLP170"
-            const parts = data.split(' ');
-            const metarData = {
-                station: parts[0],
-                time: parts[1],
-                wind: parts[2],
-                visibility: parts[4],
-                weather: parts[5],
-                temperature: parts[7].split('/')[0],
-                remarks: parts.slice(10).join(' ')
-            };
-
-            return metarData;
+            metarInfoDiv.innerHTML = `<p>${data}</p>`;
         }
     </script>
 </body>
