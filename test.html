@@ -32,7 +32,7 @@
 <body>
     <h1>Get METAR Information</h1>
     <p>Enter Airport ICAO code:</p>
-    <input type="text" id="icao" placeholder="e.g., CYYZ">
+    <input type="text" id="icao" placeholder="e.g., cyyz or CYYZ" onkeydown="checkEnter(event)">
     <button onclick="getMetar()">Fetch</button>
     <div id="metar-info"></div>
 
