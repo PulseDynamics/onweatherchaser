@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airport Information</title>
+    <title>Airport METAR Information</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,70 +22,37 @@
         #info {
             margin-top: 20px;
         }
-        .icon {
-            width: 50px;
-            height: 50px;
-        }
     </style>
 </head>
 <body>
-    <h1>Get Airport Information</h1>
+    <h1>Get Airport METAR Information</h1>
     <p>Enter ICAO code:</p>
     <input type="text" id="icao" placeholder="e.g., CYOW">
-    <button onclick="getAirportInfo()">Get Info</button>
+    <button onclick="getMetarInfo()">Get Info</button>
     <div id="info"></div>
 
     <script>
-        async function getAirportInfo() {
+        async function getMetarInfo() {
             const icao = document.getElementById('icao').value.trim().toUpperCase();
             const metarUrl = `https://metar.vatsim.net/${icao}`;
-            const commsUrl = `https://my.vatsim.net/api/v2/aip/airports/${icao}`;
 
             try {
-                // Fetch METAR data
-                const metarResponse = await fetch(metarUrl);
-                if (!metarResponse.ok) {
+                const response = await fetch(metarUrl);
+                if (!response.ok) {
                     throw new Error('Network response was not ok for METAR data');
                 }
-                const metarText = await metarResponse.text();
+                const metarText = await response.text();
                 console.log("METAR Data:", metarText); // Log METAR data for debugging
 
-                // Fetch communication data
-                const commsResponse = await fetch(commsUrl);
-                if (!commsResponse.ok) {
-                    throw new Error('Network response was not ok for communication data');
-                }
-                const commsData = await commsResponse.json();
-                console.log("Communication Data:", commsData); // Log communication data for debugging
-
-                // Check for METAR data validity
                 if (metarText.startsWith("No METAR data") || metarText.startsWith("No") || !metarText) {
                     document.getElementById('info').innerHTML = 'No METAR Information Available for the requested airport';
                 } else {
-                    displayInfo(metarText, commsData);
+                    document.getElementById('info').innerHTML = `<h2>METAR Information</h2><p>${metarText}</p>`;
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
                 document.getElementById('info').innerHTML = 'Error fetching data. Please try again.';
             }
-        }
-
-        function displayInfo(metarText, commsData) {
-            const infoDiv = document.getElementById('info');
-
-            let commsInfo = '';
-            if (commsData.data && commsData.data.frequencies) {
-                commsInfo = commsData.data.frequencies.map(f => `<p><strong>${f.type}:</strong> ${f.frequency}</p>`).join('');
-            } else {
-                commsInfo = '<p>No Communication Frequencies Available</p>';
-            }
-
-            infoDiv.innerHTML = `
-                <h2>METAR Information</h2>
-                <p>${metarText}</p>
-                <h2>Communication Frequencies</h2>
-                ${commsInfo}
-            `;
         }
     </script>
 </body>
