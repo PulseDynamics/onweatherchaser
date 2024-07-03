@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METAR Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #metar-info {
+            margin-top: 20px;
+        }
+        .icon {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Get METAR Information</h1>
+    <p>Enter ICAO code:</p>
+    <input type="text" id="icao" placeholder="e.g., CYOW">
+    <button onclick="getMetar()">Get METAR</button>
+    <div id="metar-info"></div>
+
+    <script>
+        function getMetar() {
+            const icao = document.getElementById('icao').value;
+            const url = `https://metar.vatsim.net/${icao}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    displayMetar(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching METAR data:', error);
+                    document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
+                });
+        }
+
+        function displayMetar(data) {
+            const metarInfoDiv = document.getElementById('metar-info');
+            metarInfoDiv.innerHTML = `
+                <h2>METAR Information for ${data.icao}</h2>
+                <p><strong>Temperature:</strong> ${data.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
+                <p><strong>Wind:</strong> ${data.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
+                <p><strong>Visibility:</strong> ${data.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
+                <p><strong>Weather:</strong> ${data.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
+                <p><strong>Remarks:</strong> ${data.remarks}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
