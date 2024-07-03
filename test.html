@@ -46,8 +46,11 @@
                     throw new Error('Network response was not ok');
                 }
                 const textData = await response.text();
-                console.log(textData); // Log the response data for debugging
-                displayMetar(textData);
+                if (textData.startsWith("No METAR data")) {
+                    document.getElementById('metar-info').innerHTML = 'No METAR Information Available for the requested airport';
+                } else {
+                    displayMetar(textData);
+                }
             } catch (error) {
                 console.error('Error fetching METAR data:', error);
                 document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
@@ -57,10 +60,37 @@
         function displayMetar(data) {
             const metarInfoDiv = document.getElementById('metar-info');
 
+            const metarData = parseMetar(data);
+
+            if (!metarData) {
+                metarInfoDiv.innerHTML = 'Error parsing METAR data.';
+                return;
+            }
+
             metarInfoDiv.innerHTML = `
-                <h2>METAR Information</h2>
-                <p>${data}</p>
+                <h2>METAR Information for ${metarData.station}</h2>
+                <p><strong>Temperature:</strong> ${metarData.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
+                <p><strong>Wind:</strong> ${metarData.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
+                <p><strong>Visibility:</strong> ${metarData.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
+                <p><strong>Weather:</strong> ${metarData.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
+                <p><strong>Remarks:</strong> ${metarData.remarks}</p>
             `;
+        }
+
+        function parseMetar(data) {
+            // Example METAR: "CYOW 031400Z 25015G25KT 15SM FEW025 SCT040 BKN080 25/17 A3002 RMK AC3AC3 SLP170"
+            const parts = data.split(' ');
+            const metarData = {
+                station: parts[0],
+                time: parts[1],
+                wind: parts[2],
+                visibility: parts[4],
+                weather: parts[5],
+                temperature: parts[7].split('/')[0],
+                remarks: parts.slice(10).join(' ')
+            };
+
+            return metarData;
         }
     </script>
 </body>
