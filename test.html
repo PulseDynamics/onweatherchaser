@@ -48,6 +48,7 @@
                     throw new Error('Network response was not ok for METAR data');
                 }
                 const metarText = await metarResponse.text();
+                console.log("METAR Data:", metarText); // Log METAR data for debugging
 
                 // Fetch communication data
                 const commsResponse = await fetch(commsUrl);
@@ -55,6 +56,7 @@
                     throw new Error('Network response was not ok for communication data');
                 }
                 const commsData = await commsResponse.json();
+                console.log("Communication Data:", commsData); // Log communication data for debugging
 
                 // Check for METAR data validity
                 if (metarText.startsWith("No METAR data") || metarText.startsWith("No") || !metarText) {
@@ -71,41 +73,19 @@
         function displayInfo(metarText, commsData) {
             const infoDiv = document.getElementById('info');
 
-            const metarData = parseMetar(metarText);
-
-            if (!metarData) {
-                infoDiv.innerHTML = 'Error parsing METAR data.';
-                return;
+            let commsInfo = '';
+            if (commsData.data && commsData.data.frequencies) {
+                commsInfo = commsData.data.frequencies.map(f => `<p><strong>${f.type}:</strong> ${f.frequency}</p>`).join('');
+            } else {
+                commsInfo = '<p>No Communication Frequencies Available</p>';
             }
 
-            const commsInfo = commsData.data.frequencies.map(f => `<p><strong>${f.type}:</strong> ${f.frequency}</p>`).join('');
-
             infoDiv.innerHTML = `
-                <h2>METAR Information for ${metarData.station}</h2>
-                <p><strong>Temperature:</strong> ${metarData.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
-                <p><strong>Wind:</strong> ${metarData.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
-                <p><strong>Visibility:</strong> ${metarData.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
-                <p><strong>Weather:</strong> ${metarData.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
-                <p><strong>Remarks:</strong> ${metarData.remarks}</p>
+                <h2>METAR Information</h2>
+                <p>${metarText}</p>
                 <h2>Communication Frequencies</h2>
                 ${commsInfo}
             `;
-        }
-
-        function parseMetar(data) {
-            // Example METAR: "CYOW 031400Z 25015G25KT 15SM FEW025 SCT040 BKN080 25/17 A3002 RMK AC3AC3 SLP170"
-            const parts = data.split(' ');
-            const metarData = {
-                station: parts[0],
-                time: parts[1],
-                wind: parts[2],
-                visibility: parts[4],
-                weather: parts[5],
-                temperature: parts[7].split('/')[0],
-                remarks: parts.slice(10).join(' ')
-            };
-
-            return metarData;
         }
     </script>
 </body>
