@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Airport METAR Information</title>
+    <title>METAR Information</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,40 +19,78 @@
             padding: 10px 20px;
             font-size: 16px;
         }
-        #info {
+        #metar-info {
             margin-top: 20px;
+        }
+        .icon {
+            width: 50px;
+            height: 50px;
         }
     </style>
 </head>
 <body>
-    <h1>Get Airport METAR Information</h1>
+    <h1>Get METAR Information</h1>
     <p>Enter ICAO code:</p>
     <input type="text" id="icao" placeholder="e.g., CYOW">
-    <button onclick="getMetarInfo()">Get Info</button>
-    <div id="info"></div>
+    <button onclick="getMetar()">Get METAR</button>
+    <div id="metar-info"></div>
 
     <script>
-        async function getMetarInfo() {
+        async function getMetar() {
             const icao = document.getElementById('icao').value.trim().toUpperCase();
-            const metarUrl = `https://metar.vatsim.net/${icao}`;
+            const url = `https://metar.vatsim.net/${icao}`;
 
             try {
-                const response = await fetch(metarUrl);
+                const response = await fetch(url);
                 if (!response.ok) {
-                    throw new Error('Network response was not ok for METAR data');
+                    throw new Error('Network response was not ok');
                 }
-                const metarText = await response.text();
-                console.log("METAR Data:", metarText); // Log METAR data for debugging
-
-                if (metarText.startsWith("No METAR data") || metarText.startsWith("No") || !metarText) {
-                    document.getElementById('info').innerHTML = 'No METAR Information Available for the requested airport';
+                const textData = await response.text();
+                if (textData.startsWith("No METAR data")) {
+                    document.getElementById('metar-info').innerHTML = 'No METAR Information Available for the requested airport';
                 } else {
-                    document.getElementById('info').innerHTML = `<h2>METAR Information</h2><p>${metarText}</p>`;
+                    displayMetar(textData);
                 }
             } catch (error) {
-                console.error('Error fetching data:', error);
-                document.getElementById('info').innerHTML = 'Error fetching data. Please try again.';
+                console.error('Error fetching METAR data:', error);
+                document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
             }
+        }
+
+        function displayMetar(data) {
+            const metarInfoDiv = document.getElementById('metar-info');
+
+            const metarData = parseMetar(data);
+
+            if (!metarData) {
+                metarInfoDiv.innerHTML = 'Error parsing METAR data.';
+                return;
+            }
+
+            metarInfoDiv.innerHTML = `
+                <h2>METAR Information for ${metarData.station}</h2>
+                <p><strong>Temperature:</strong> ${metarData.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
+                <p><strong>Wind:</strong> ${metarData.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
+                <p><strong>Visibility:</strong> ${metarData.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
+                <p><strong>Weather:</strong> ${metarData.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
+                <p><strong>Remarks:</strong> ${metarData.remarks}</p>
+            `;
+        }
+
+        function parseMetar(data) {
+            // Example METAR: "CYOW 031400Z 25015G25KT 15SM FEW025 SCT040 BKN080 25/17 A3002 RMK AC3AC3 SLP170"
+            const parts = data.split(' ');
+            const metarData = {
+                station: parts[0],
+                time: parts[1],
+                wind: parts[2],
+                visibility: parts[4],
+                weather: parts[5],
+                temperature: parts[7].split('/')[0],
+                remarks: parts.slice(10).join(' ')
+            };
+
+            return metarData;
         }
     </script>
 </body>
