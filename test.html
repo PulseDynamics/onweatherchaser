@@ -45,9 +45,9 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                const data = await response.json();
-                console.log(data); // Log the response data for debugging
-                displayMetar(data);
+                const textData = await response.text();
+                console.log(textData); // Log the response data for debugging
+                displayMetar(textData);
             } catch (error) {
                 console.error('Error fetching METAR data:', error);
                 document.getElementById('metar-info').innerHTML = 'Error fetching data. Please try again.';
@@ -57,19 +57,9 @@
         function displayMetar(data) {
             const metarInfoDiv = document.getElementById('metar-info');
 
-            // Check if the required fields are present in the data
-            if (!data.temperature || !data.wind || !data.visibility || !data.weather || !data.remarks) {
-                metarInfoDiv.innerHTML = 'Invalid data received. Please check the ICAO code and try again.';
-                return;
-            }
-
             metarInfoDiv.innerHTML = `
-                <h2>METAR Information for ${data.icao}</h2>
-                <p><strong>Temperature:</strong> ${data.temperature}°C <img class="icon" src="https://www.iconfinder.com/icons/4529011/download/svg/64/temperature.svg" alt="Temperature icon"></p>
-                <p><strong>Wind:</strong> ${data.wind} <img class="icon" src="https://www.iconfinder.com/icons/4529015/download/svg/64/wind.svg" alt="Wind icon"></p>
-                <p><strong>Visibility:</strong> ${data.visibility} <img class="icon" src="https://www.iconfinder.com/icons/4529013/download/svg/64/visibility.svg" alt="Visibility icon"></p>
-                <p><strong>Weather:</strong> ${data.weather} <img class="icon" src="https://www.iconfinder.com/icons/4529017/download/svg/64/cloud.svg" alt="Weather icon"></p>
-                <p><strong>Remarks:</strong> ${data.remarks}</p>
+                <h2>METAR Information</h2>
+                <p>${data}</p>
             `;
         }
     </script>
